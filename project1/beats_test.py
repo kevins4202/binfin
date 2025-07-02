@@ -3,9 +3,19 @@
 
 import torch
 from BEATs import BEATs, BEATsConfig
+import requests
+import io
+import os
+from huggingface_hub import hf_hub_download
+
+model_path = hf_hub_download(
+    repo_id="kevins4202/beats",
+    filename="beats_model.pt",
+    token=os.environ.get("HF_TOKEN") 
+)
 
 # load the pre-trained checkpoints
-model_checkpoint = torch.load('model/beats_model.pt', weights_only=True)
+model_checkpoint = torch.load(model_path, weights_only=True)
 
 model_cfg = BEATsConfig(model_checkpoint['cfg'])
 BEATs_model = BEATs(model_cfg)

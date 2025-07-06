@@ -20,6 +20,9 @@ model = load_classifier(freeze_beats=True).to(device)
 model.train()
 model = torch.compile(model)
 print("Model loaded and compiled")
+print("Total parameters: ", sum(p.numel() for p in model.parameters()))
+print("Frozen parameters: ", sum(p.numel() for p in model.parameters() if p.requires_grad is False))
+print("Trainable parameters: ", sum(p.numel() for p in model.parameters() if p.requires_grad is True))
 
 lr = 3e-4
 steps = 20

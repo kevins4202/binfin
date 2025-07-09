@@ -28,11 +28,11 @@ def get_eval_metrics(logits: torch.Tensor,
     """
 
     # Ensure CPU and convert to numpy for sklearn
-    logits = logits.detach().cpu()
-    true_labels = labels.detach().cpu()
+    logits = logits.numpy()
+    true_labels = labels.numpy()
     
     # Apply sigmoid to get probabilities for better interpretability
-    probabilities = torch.sigmoid(logits)
+    probabilities = torch.sigmoid(torch.from_numpy(logits))
     
     # EER computation
     # EER needs labels: 1 = genuine, 0 = spoof — so we invert for EER only

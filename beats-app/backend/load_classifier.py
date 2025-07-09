@@ -63,8 +63,8 @@ def load_finetuned_head(load_head):
     return head
 
 
-def load_classifier(freeze_beats=True, load_head=False):
-    model = DeepfakeClassifier(freeze_beats, load_head)
+def load_classifier(freeze_beats=True, load_base=True, load_head=True):
+    model = DeepfakeClassifier(freeze_beats, load_base, load_head)
 
     return model
 

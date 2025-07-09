@@ -23,9 +23,7 @@ CORS(app)
 # Load model with proper error handling
 try:
     print("Loading model...")
-    model = load_classifier(freeze_beats=True, load_head=True)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model.to(device)
+    model = load_classifier(freeze_beats=True, load_base=True, load_head=True)
     model.eval()
     print("Model loaded successfully")
 except Exception as e:

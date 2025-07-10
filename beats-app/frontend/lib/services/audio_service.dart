@@ -1,15 +1,17 @@
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:typed_data';
 
 class AudioService {
   static const List<String> baseUrls = [
     'http://127.0.0.1:5015',
     'http://localhost:5015',
-    'http://0.0.0.0:5015',
   ];
   
-  static Future<Map<String, dynamic>> uploadAudioFile(File file) async {
+  static Future<Map<String, dynamic>> uploadAudioFile(
+    Uint8List fileBytes,
+    String? fileName,
+  ) async {
     Exception? lastException;
     
     for (String baseUrl in baseUrls) {
@@ -22,11 +24,12 @@ class AudioService {
           Uri.parse('$baseUrl/api/predict'),
         );
         
-        // Add file to request
+        // Add file to request using bytes
         request.files.add(
-          await http.MultipartFile.fromPath(
+          http.MultipartFile.fromBytes(
             'file',
-            file.path,
+            fileBytes,
+            filename: fileName ?? 'audio.wav',
           ),
         );
         

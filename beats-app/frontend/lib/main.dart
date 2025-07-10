@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 import 'services/audio_service.dart';
 import 'models/prediction_result.dart';
 
@@ -32,7 +34,8 @@ class AudioUploadScreen extends StatefulWidget {
 }
 
 class _AudioUploadScreenState extends State<AudioUploadScreen> {
-  File? selectedFile;
+  Uint8List? selectedFileBytes;
+  String? selectedFileName;
   PredictionResult? predictionResult;
   bool isLoading = false;
   String? errorMessage;
@@ -46,7 +49,8 @@ class _AudioUploadScreenState extends State<AudioUploadScreen> {
 
       if (result != null) {
         setState(() {
-          selectedFile = File(result.files.single.path!);
+          selectedFileBytes = result.files.single.bytes;
+          selectedFileName = result.files.single.name;
           predictionResult = null;
           errorMessage = null;
         });
@@ -59,7 +63,7 @@ class _AudioUploadScreenState extends State<AudioUploadScreen> {
   }
 
   Future<void> uploadAndPredict() async {
-    if (selectedFile == null) {
+    if (selectedFileBytes == null) {
       setState(() {
         errorMessage = 'Please select a WAV file first';
       });
@@ -72,7 +76,10 @@ class _AudioUploadScreenState extends State<AudioUploadScreen> {
     });
 
     try {
-      final response = await AudioService.uploadAudioFile(selectedFile!);
+      final response = await AudioService.uploadAudioFile(
+        selectedFileBytes!,
+        selectedFileName,
+      );
       final result = PredictionResult.fromJson(response);
       
       setState(() {
@@ -124,10 +131,10 @@ class _AudioUploadScreenState extends State<AudioUploadScreen> {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        if (selectedFile != null)
+                        if (selectedFileBytes != null)
                           Expanded(
                             child: Text(
-                              selectedFile!.path.split('/').last,
+                              selectedFileName ?? 'Unknown file',
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
@@ -145,7 +152,7 @@ class _AudioUploadScreenState extends State<AudioUploadScreen> {
             const SizedBox(height: 16),
             
             // Upload and predict button
-            if (selectedFile != null)
+            if (selectedFileBytes != null)
               ElevatedButton(
                 onPressed: isLoading ? null : uploadAndPredict,
                 style: ElevatedButton.styleFrom(
